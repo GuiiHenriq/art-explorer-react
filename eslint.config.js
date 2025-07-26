@@ -6,6 +6,8 @@ import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 import prettierPlugin from 'eslint-plugin-prettier';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import parser from '@typescript-eslint/parser';
 
 export default [
   js.configs.recommended,
@@ -13,6 +15,7 @@ export default [
   {
     ignores: [
       'eslint.config.js',
+      'vite.config.ts',
       'commitlint.config.js',
       '.husky/**',
       'node_modules/**',
@@ -26,14 +29,18 @@ export default [
         ...globals.browser,
         ...globals.node,
       },
+      parser: parser,
       parserOptions: {
-        project: './tsconfig.json',
+        projectService: true,
+        ecmaVersion: 2020,
+        sourceType: 'module',
       },
     },
     plugins: {
       react: reactPlugin,
       'react-hooks': reactHooks,
       prettier: prettierPlugin,
+      '@typescript-eslint': typescriptEslint
     },
     settings: {
       react: {

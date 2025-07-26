@@ -17,7 +17,8 @@ module.exports = {
         ":bulb: docs",
         ":card_file_box: raw",
         ":wrench: chore",
-        ":heavy_plus_sign: build"
+        ":heavy_plus_sign: build",
+        ":label:"
       ],
     ],
     "type-case": [0],
