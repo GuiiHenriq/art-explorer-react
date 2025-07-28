@@ -60,3 +60,10 @@ export interface SearchParams {
   dateEnd?: number;
   q?: string;
 }
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
