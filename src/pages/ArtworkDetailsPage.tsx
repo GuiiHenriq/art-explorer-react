@@ -11,27 +11,27 @@ import {
   ArtworkImage,
   InfoSection,
   AdditionalDetails,
-  ExternalLinkButton
+  ExternalLinkButton,
 } from '../components/artwork-details';
 import type { Artwork } from '../types/artwork';
 
 const ANIMATION_VARIANTS = {
   fadeInUp: {
     initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 }
+    animate: { opacity: 1, y: 0 },
   },
   fadeInLeft: {
     initial: { opacity: 0, x: -50 },
-    animate: { opacity: 1, x: 0 }
+    animate: { opacity: 1, x: 0 },
   },
   fadeInRight: {
     initial: { opacity: 0, x: 50 },
-    animate: { opacity: 1, x: 0 }
+    animate: { opacity: 1, x: 0 },
   },
   fadeInDown: {
     initial: { opacity: 0, y: -20 },
-    animate: { opacity: 1, y: 0 }
-  }
+    animate: { opacity: 1, y: 0 },
+  },
 } as const;
 
 export default function ArtworkDetailsPage() {
@@ -50,8 +50,7 @@ export default function ArtworkDetailsPage() {
     }
   }, [artwork, toggleFavorite]);
 
-  const handleImageError = useCallback(() => {
-  }, []);
+  const handleImageError = useCallback(() => {}, []);
 
   const isFavorite = useMemo(() => {
     return artwork ? favorites.some((fav: Artwork) => fav.objectID === artwork.objectID) : false;
@@ -68,7 +67,7 @@ export default function ArtworkDetailsPage() {
         value: artwork.artistDisplayName!,
         description: artwork.artistDisplayBio,
         gradient: 'bg-gradient-to-br from-purple-500 to-blue-500',
-        delay: 0.8
+        delay: 0.8,
       },
       {
         condition: artwork.objectDate,
@@ -76,7 +75,7 @@ export default function ArtworkDetailsPage() {
         label: 'Date',
         value: artwork.objectDate!,
         gradient: 'bg-gradient-to-br from-green-500 to-emerald-500',
-        delay: 1.0
+        delay: 1.0,
       },
       {
         condition: artwork.medium,
@@ -84,7 +83,7 @@ export default function ArtworkDetailsPage() {
         label: 'Technique',
         value: artwork.medium!,
         gradient: 'bg-gradient-to-br from-orange-500 to-red-500',
-        delay: 1.2
+        delay: 1.2,
       },
       {
         condition: artwork.department,
@@ -92,9 +91,9 @@ export default function ArtworkDetailsPage() {
         label: 'Department',
         value: artwork.department!,
         gradient: 'bg-gradient-to-br from-indigo-500 to-purple-500',
-        delay: 1.4
-      }
-    ].filter(section => section.condition);
+        delay: 1.4,
+      },
+    ].filter((section) => section.condition);
   }, [artwork]);
 
   if (loading) {
@@ -113,20 +112,28 @@ export default function ArtworkDetailsPage() {
     <div className="w-full">
       <BackButton onClick={handleBack} />
 
-      <div className="grid lg:grid-cols-2 gap-12 items-start">
-        <ArtworkImage
-          artwork={artwork}
-          isFavorite={isFavorite}
-          onToggleFavorite={handleToggleFavorite}
-          onImageError={handleImageError}
-        />
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+        <motion.div
+          variants={ANIMATION_VARIANTS.fadeInLeft}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 0.2 }}
+          className="sticky top-8"
+        >
+          <ArtworkImage
+            artwork={artwork}
+            isFavorite={isFavorite}
+            onToggleFavorite={handleToggleFavorite}
+            onImageError={handleImageError}
+          />
+        </motion.div>
 
         <motion.div
           variants={ANIMATION_VARIANTS.fadeInRight}
           initial="initial"
           animate="animate"
           transition={{ delay: 0.4 }}
-          className="space-y-8"
+          className="space-y-8 lg:pl-4"
         >
           <motion.div
             variants={ANIMATION_VARIANTS.fadeInUp}
@@ -134,7 +141,7 @@ export default function ArtworkDetailsPage() {
             animate="animate"
             transition={{ delay: 0.6 }}
           >
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight text-gray-900">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900">
               {artwork.title}
             </h1>
           </motion.div>
@@ -151,9 +158,7 @@ export default function ArtworkDetailsPage() {
             />
           ))}
 
-          {artwork.objectURL && (
-            <ExternalLinkButton url={artwork.objectURL} delay={1.6} />
-          )}
+          {artwork.objectURL && <ExternalLinkButton url={artwork.objectURL} delay={1.6} />}
 
           <AdditionalDetails artwork={artwork} />
         </motion.div>
