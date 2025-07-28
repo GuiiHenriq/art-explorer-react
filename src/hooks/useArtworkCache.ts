@@ -16,7 +16,7 @@ interface UseArtworkCacheReturn {
   cacheStats: { totalCached: number; cacheSize: number } | null;
 }
 
-const BATCH_SIZE = 45;
+const BATCH_SIZE = 15;
 
 export const useArtworkCache = (): UseArtworkCacheReturn => {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
@@ -26,7 +26,9 @@ export const useArtworkCache = (): UseArtworkCacheReturn => {
   const [totalResults, setTotalResults] = useState(0);
   const [objectIDs, setObjectIDs] = useState<number[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [cacheStats, setCacheStats] = useState<{ totalCached: number; cacheSize: number } | null>(null);
+  const [cacheStats, setCacheStats] = useState<{ totalCached: number; cacheSize: number } | null>(
+    null,
+  );
 
   const fetchCacheStats = useCallback(async () => {
     try {
@@ -39,7 +41,7 @@ export const useArtworkCache = (): UseArtworkCacheReturn => {
 
   const fetchCachedArtworks = useCallback(async (ids: number[]): Promise<Artwork[]> => {
     if (ids.length === 0) return [];
-    
+
     try {
       const cachedArtworks = await MetAPI.getCachedArtworks(ids);
       return cachedArtworks;
@@ -49,48 +51,38 @@ export const useArtworkCache = (): UseArtworkCacheReturn => {
     }
   }, []);
 
-  const preloadNextBatch = useCallback(async (): Promise<void> => {
-    if (objectIDs.length === 0) return;
+  const search = useCallback(
+    async (params: SearchParams) => {
+      setLoading(true);
+      setError(null);
+      setCurrentBatch(0);
+      setArtworks([]);
+      setHasMore(true);
 
-    const nextBatchStart = (currentBatch + 1) * BATCH_SIZE;
-    if (nextBatchStart >= objectIDs.length) return;
+      try {
+        const searchResult = await MetAPI.searchArtworksWithCache(params);
+        setObjectIDs(searchResult.objectIDs || []);
+        setTotalResults(searchResult.total || 0);
 
-    try {
-      await MetAPI.preloadBatch(objectIDs, currentBatch);
-      console.log(`Batch ${currentBatch + 1} preloaded`);
-    } catch (error) {
-      console.error('Error preloading next batch:', error);
-    }
-  }, [objectIDs, currentBatch]);
+        if (searchResult.objectIDs && searchResult.objectIDs.length > 0) {
+          await MetAPI.preloadBatch(searchResult.objectIDs, 0);
+        }
 
-  const search = useCallback(async (params: SearchParams) => {
-    setLoading(true);
-    setError(null);
-    setCurrentBatch(0);
-    setArtworks([]);
-    setHasMore(true);
+        const firstBatchIds = searchResult.objectIDs?.slice(0, BATCH_SIZE) || [];
+        const firstBatchArtworks = await fetchCachedArtworks(firstBatchIds);
 
-    try {
-      const searchResult = await MetAPI.searchArtworksWithCache(params);
-      setObjectIDs(searchResult.objectIDs || []);
-      setTotalResults(searchResult.total || 0);
+        setArtworks(firstBatchArtworks);
+        setHasMore((searchResult.objectIDs?.length || 0) > BATCH_SIZE);
 
-      const firstBatchIds = searchResult.objectIDs?.slice(0, BATCH_SIZE) || [];
-      const firstBatchArtworks = await fetchCachedArtworks(firstBatchIds);
-      
-      setArtworks(firstBatchArtworks);
-      setHasMore((searchResult.objectIDs?.length || 0) > BATCH_SIZE);
-      
-      setHasMore((searchResult.objectIDs?.length || 0) > BATCH_SIZE);
-      
-      await fetchCacheStats();
-
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchCachedArtworks, fetchCacheStats]);
+        await fetchCacheStats();
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchCachedArtworks, fetchCacheStats],
+  );
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) return;
@@ -109,31 +101,19 @@ export const useArtworkCache = (): UseArtworkCacheReturn => {
         return;
       }
 
+      await MetAPI.preloadBatch(objectIDs, nextBatch);
+
       const batchArtworks = await fetchCachedArtworks(batchIds);
-      
-      if (batchArtworks.length < batchIds.length) {
-        await preloadNextBatch();
-        const retryArtworks = await fetchCachedArtworks(batchIds);
-        setArtworks(prev => [...prev, ...retryArtworks]);
-      } else {
-        setArtworks(prev => [...prev, ...batchArtworks]);
-      }
+      setArtworks((prev) => [...prev, ...batchArtworks]);
 
       setCurrentBatch(nextBatch);
       setHasMore(endIndex < objectIDs.length);
-
-      if (endIndex < objectIDs.length) {
-        setTimeout(() => {
-          MetAPI.preloadBatch(objectIDs, nextBatch + 1).catch(console.error);
-        }, 1000);
-      }
-
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error loading more artworks');
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentBatch, objectIDs, fetchCachedArtworks, preloadNextBatch]);
+  }, [loading, hasMore, currentBatch, objectIDs, fetchCachedArtworks]);
 
   const clearCache = useCallback(async () => {
     try {
@@ -166,4 +146,4 @@ export const useArtworkCache = (): UseArtworkCacheReturn => {
     clearCache,
     cacheStats,
   };
-}; 
+};

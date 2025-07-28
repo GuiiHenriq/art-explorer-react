@@ -137,11 +137,11 @@ export const preloadBatch = asyncHandler(
       return;
     }
 
-    const startIndex = currentBatch * 45;
+    const startIndex = currentBatch * 15;
     
-    const cachedCount = cacheService.getCachedCount(objectIDs, startIndex + 45);
+    const cachedCount = cacheService.getCachedCount(objectIDs, startIndex + 15);
     
-    if (cachedCount >= startIndex + 45) {
+    if (cachedCount >= startIndex + 15) {
       res.json({
         success: true,
         data: { cached: true },
@@ -237,25 +237,10 @@ export const searchArtworksWithCache = asyncHandler(
 
     const result = await metAPIService.searchArtworks(searchParams);
 
-    if (result.objectIDs && result.objectIDs.length > 0) {
-      setTimeout(async () => {
-        try {
-          await cacheService.preloadBatch(
-            result.objectIDs,
-            0,
-            metAPIService.getArtworkDetails.bind(metAPIService)
-          );
-          console.log('First batch preloaded automatically');
-        } catch (error) {
-          console.error('Error preloading first batch:', error);
-        }
-      }, 100);
-    }
-
     res.json({
       success: true,
       data: result,
-      message: 'Search completed successfully and first batch being preloaded',
+      message: 'Search completed successfully',
     });
   }
 );

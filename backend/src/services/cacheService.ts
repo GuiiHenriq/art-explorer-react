@@ -2,7 +2,7 @@ import { Artwork } from '../types/artwork';
 
 class CacheService {
   private cache = new Map<number, Artwork>();
-  private readonly BATCH_SIZE = 45;
+  private readonly BATCH_SIZE = 15;
   private readonly DELAY_BETWEEN_REQUESTS = 500;
 
   private async fetchItemWithDelay(
