@@ -9,14 +9,7 @@ import type { Artwork } from '../types/artwork';
 export default function HomePage() {
   const navigate = useNavigate();
   const { favorites, toggleFavorite } = useStore();
-  const {
-    artworks,
-    loading,
-    error,
-    hasMore,  
-    search,
-    loadMore
-  } = useArtworkCache();
+  const { artworks, loading, error, hasMore, search, loadMore } = useArtworkCache();
 
   useEffect(() => {
     search({ hasImages: true, q: 'painting' });
@@ -67,7 +60,7 @@ export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <main>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {artworks.map((artwork) => (
             <ArtworkCard
               key={artwork.objectID}
@@ -78,7 +71,7 @@ export default function HomePage() {
             />
           ))}
         </div>
-        
+
         {hasMore && (
           <div className="flex justify-center mt-8">
             <button
