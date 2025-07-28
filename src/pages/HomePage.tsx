@@ -1,115 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MetAPI } from '../services/metAPI';
+import { useArtworkCache } from '../hooks/useArtworkCache';
+import { useStore } from '../store/useStore';
+import ArtworkCard from '../components/ArtworkCard';
+import LoadingSpinner from '../components/LoadingSpinner';
 import type { Artwork } from '../types/artwork';
-
-const ARTWORKS_LIMIT = 15;
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [artworks, setArtworks] = useState<Artwork[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [objectIDs, setObjectIDs] = useState<number[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
+  const { favorites, toggleFavorite } = useStore();
+  const {
+    artworks,
+    loading,
+    error,
+    hasMore,  
+    search,
+    loadMore
+  } = useArtworkCache();
 
   useEffect(() => {
-    const loadInitial = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const searchResponse = await MetAPI.searchArtworks();
-        const ids = searchResponse.objectIDs || [];
-        if (ids.length === 0) {
-          setArtworks([]);
-          setObjectIDs([]);
-          setHasMore(false);
-          return;
-        }
-        const limitedIDs = ids.slice(0, ARTWORKS_LIMIT);
-        setObjectIDs(limitedIDs);
-        const firstPageIDs = limitedIDs.slice(0, ARTWORKS_LIMIT);
-        const artworkPromises = firstPageIDs.map((id) => MetAPI.getArtworkDetails(id));
-        const artworkDetails = await Promise.all(artworkPromises);
-        const validArtworks = artworkDetails.filter(Boolean);
-        setArtworks(validArtworks);
-        setCurrentPage(0);
-        setHasMore(ARTWORKS_LIMIT < limitedIDs.length);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Error loading artworks';
-        setError(errorMessage);
-        setArtworks([]);
-        setObjectIDs([]);
-        setHasMore(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadInitial();
-  }, []);
+    search({ hasImages: true, q: 'painting' });
+  }, [search]);
 
-  const loadMore = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-    try {
-      const nextPage = currentPage + 1;
-      const start = nextPage * ARTWORKS_LIMIT;
-      const end = start + ARTWORKS_LIMIT;
-      const nextIDs = objectIDs.slice(start, end);
-      if (nextIDs.length === 0) {
-        setHasMore(false);
-        return;
-      }
-      const artworkPromises = nextIDs.map((id) => MetAPI.getArtworkDetails(id));
-      const artworkDetails = await Promise.all(artworkPromises);
-      const validArtworks = artworkDetails.filter(Boolean);
-      setArtworks((prev) => [...prev, ...validArtworks]);
-      setCurrentPage(nextPage);
-      setHasMore(end < objectIDs.length);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error loading artworks';
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleArtworkClick = (artwork: Artwork) => {
+  const handleArtworkSelect = (artwork: Artwork) => {
     navigate(`/artwork/${artwork.objectID}`);
   };
 
-  const renderArtworkItem = (artwork: Artwork) => (
-    <article
-      key={artwork.objectID}
-      className="mb-8 p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-      onClick={() => handleArtworkClick(artwork)}
-    >
-      <h2 className="text-xl font-semibold mb-2">{artwork.title || 'Title not specified'}</h2>
-      <p className="text-gray-700 mb-1">
-        <strong>Artist:</strong> {artwork.artistDisplayName || 'Artist not specified'}
-      </p>
-      <p className="text-gray-700 mb-1">
-        <strong>Date:</strong> {artwork.objectDate || 'Date not specified'}
-      </p>
-      <p className="text-gray-700 mb-3">
-        <strong>Department:</strong> {artwork.department || 'Not specified'}
-      </p>
-      {artwork.primaryImage && (
-        <img
-          src={artwork.primaryImage}
-          alt={artwork.title || 'Artwork'}
-          className="max-w-xs h-auto rounded shadow-sm"
-          loading="lazy"
-        />
-      )}
-    </article>
-  );
+  const handleToggleFavorite = (artwork: Artwork) => {
+    toggleFavorite(artwork);
+  };
+
+  const isFavorite = (artwork: Artwork) => {
+    return favorites.some((fav: Artwork) => fav.objectID === artwork.objectID);
+  };
 
   if (loading && artworks.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-64">
-        <div>Loading...</div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -138,15 +66,19 @@ export default function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Artworks</h1>
-        <p className="text-gray-600 mt-2">
-          Displaying {artworks.length} artwork{artworks.length !== 1 ? 's' : ''}
-        </p>
-      </header>
-
       <main>
-        <div className="space-y-6">{artworks.map(renderArtworkItem)}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {artworks.map((artwork) => (
+            <ArtworkCard
+              key={artwork.objectID}
+              artwork={artwork}
+              onSelect={handleArtworkSelect}
+              onToggleFavorite={handleToggleFavorite}
+              isFavorite={isFavorite(artwork)}
+            />
+          ))}
+        </div>
+        
         {hasMore && (
           <div className="flex justify-center mt-8">
             <button
