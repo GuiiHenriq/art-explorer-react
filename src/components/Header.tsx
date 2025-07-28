@@ -2,14 +2,23 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Heart, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from '../store/useStore';
+
+interface NavItem {
+  path: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  count?: number;
+}
 
 const Header = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const favorites = useStore((state) => state.favorites);
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { path: '/', icon: Home, label: 'Home' },
-    { path: '/favorites', icon: Heart, label: 'Favorites' }
+    { path: '/favorites', icon: Heart, label: 'Favorites', count: favorites.length }
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -56,6 +65,15 @@ const Header = () => {
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
+                  {item.count && item.count > 0 && (
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center"
+                    >
+                      {item.count}
+                    </motion.span>
+                  )}
                   {isActive(item.path) && (
                     <motion.div
                       layoutId="activeTab"
@@ -134,6 +152,15 @@ const Header = () => {
                       >
                         <Icon size={20} />
                         <span>{item.label}</span>
+                        {item.count && item.count > 0 && (
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] flex items-center justify-center ml-auto"
+                          >
+                            {item.count}
+                          </motion.span>
+                        )}
                       </Link>
                     </motion.div>
                   );
