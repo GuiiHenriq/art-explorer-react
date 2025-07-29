@@ -4,7 +4,8 @@ import { useArtworkCache } from '../hooks/useArtworkCache';
 import { useStore } from '../store/useStore';
 import ArtworkCard from '../components/ArtworkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
-import type { Artwork } from '../types/artwork';
+import SearchBar from '../components/SearchBar';
+import type { Artwork, SearchParams } from '../types/artwork';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -25,6 +26,14 @@ export default function HomePage() {
 
   const isFavorite = (artwork: Artwork) => {
     return favorites.some((fav: Artwork) => fav.objectID === artwork.objectID);
+  };
+
+  const handleSearch = (searchParams: SearchParams) => {
+    search(searchParams);
+  };
+
+  const handleClear = () => {
+    search({ hasImages: true, q: 'painting' });
   };
 
   if (loading && artworks.length === 0) {
@@ -60,6 +69,17 @@ export default function HomePage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <main>
+        <SearchBar onSearch={handleSearch} isLoading={loading} onClear={handleClear} />
+
+        {artworks.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Search results ({artworks.length}{' '}
+              {artworks.length === 1 ? 'artwork found' : 'artworks found'})
+            </h2>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {artworks.map((artwork) => (
             <ArtworkCard

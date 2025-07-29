@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 import HomePage from './HomePage';
-import type { Artwork } from '../types/artwork';
+import type { Artwork, SearchParams } from '../types/artwork';
 
 const mockNavigate = jest.fn();
 const mockToggleFavorite = jest.fn();
@@ -60,6 +60,13 @@ jest.mock('../components/ArtworkCard', () => {
 jest.mock('../components/LoadingSpinner', () => {
   return function MockLoadingSpinner() {
     return <div data-testid="loading-spinner">Loading artwork...</div>;
+  };
+});
+
+jest.mock('../components/SearchBar', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return function MockSearchBar(_props: { onSearch: (params: SearchParams) => void }) {
+    return <div data-testid="search-bar">Search Bar Component</div>;
   };
 });
 
