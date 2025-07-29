@@ -1,5 +1,8 @@
 import '@testing-library/jest-dom';
 import * as React from 'react';
+import { TextEncoder, TextDecoder } from 'util';
+
+Object.assign(global, { TextEncoder, TextDecoder });
 
 jest.mock('framer-motion', () => {
   const actual = jest.requireActual('framer-motion');
