@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MetAPI } from '../services/metAPI';
 import type { Department, SearchParams } from '../types/artwork';
 
@@ -21,9 +21,13 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
   const [departments, setDepartments] = useState<Department[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
+  const departmentsLoaded = useRef(false);
 
   useEffect(() => {
-    loadDepartments();
+    if (!departmentsLoaded.current) {
+      departmentsLoaded.current = true;
+      loadDepartments();
+    }
   }, []);
 
   const loadDepartments = async () => {

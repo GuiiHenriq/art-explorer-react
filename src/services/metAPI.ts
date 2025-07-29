@@ -50,35 +50,6 @@ export const MetAPI = {
     return response.data;
   },
 
-  async searchArtworksWithCache(params: SearchParams = {}): Promise<SearchResponse> {
-    const response = await api.get('/artworks/search-with-cache', { params });
-    return response.data;
-  },
-
-  async preloadBatch(objectIDs: number[], currentBatch: number): Promise<{ cached: boolean }> {
-    const response = await api.post('/artworks/preload-batch', {
-      objectIDs,
-      currentBatch,
-    });
-    return response.data;
-  },
-
-  async getCachedArtworks(objectIDs: number[]): Promise<Artwork[]> {
-    const response = await api.get('/artworks/cached', {
-      params: { objectIDs: objectIDs.join(',') },
-    });
-    return response.data;
-  },
-
-  async getCacheStats(): Promise<{ totalCached: number; cacheSize: number }> {
-    const response = await api.get('/artworks/cache/stats');
-    return response.data;
-  },
-
-  async clearCache(): Promise<void> {
-    await api.delete('/artworks/cache');
-  },
-
   async getArtworkDetails(objectID: number): Promise<Artwork> {
     const response = await api.get(`/artworks/${objectID}`);
     return response.data;

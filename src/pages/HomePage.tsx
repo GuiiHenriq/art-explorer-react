@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useArtworkCache } from '../hooks/useArtworkCache';
+import { useArtworks } from '../hooks/useArtworks';
 import { useStore } from '../store/useStore';
 import ArtworkCard from '../components/ArtworkCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -10,10 +10,14 @@ import type { Artwork, SearchParams } from '../types/artwork';
 export default function HomePage() {
   const navigate = useNavigate();
   const { favorites, toggleFavorite } = useStore();
-  const { artworks, loading, error, hasMore, search, loadMore } = useArtworkCache();
+  const { artworks, loading, error, hasMore, search, loadMore } = useArtworks();
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    search({ hasImages: true, q: 'painting' });
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      search({ hasImages: true, q: 'painting' });
+    }
   }, [search]);
 
   const handleArtworkSelect = (artwork: Artwork) => {

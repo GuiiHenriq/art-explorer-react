@@ -5,43 +5,23 @@ import {
   getDepartments,
   searchByArtist,
   searchByDepartment,
-  preloadBatch,
-  getCachedArtworks,
-  getCacheStats,
-  clearCache,
-  searchArtworksWithCache,
 } from '../controllers/artworkController';
 
 const router = Router();
 
-// GET /api/artworks/search - Buscar obras de arte (versão original)
+// GET /api/artworks/search - Search for artworks
 router.get('/search', searchArtworks);
 
-// GET /api/artworks/search-with-cache - Buscar obras de arte com cache automático
-router.get('/search-with-cache', searchArtworksWithCache);
-
-// POST /api/artworks/preload-batch - Pré-carregar próximo lote
-router.post('/preload-batch', preloadBatch);
-
-// GET /api/artworks/cached - Obter artworks do cache
-router.get('/cached', getCachedArtworks);
-
-// GET /api/artworks/cache/stats - Obter estatísticas do cache
-router.get('/cache/stats', getCacheStats);
-
-// DELETE /api/artworks/cache - Limpar cache
-router.delete('/cache', clearCache);
-
-// GET /api/artworks/departments - Listar departamentos
+// GET /api/artworks/departments - List departments
 router.get('/departments', getDepartments);
 
-// GET /api/artworks/:objectID - Obter detalhes de uma obra específica
+// GET /api/artworks/:objectID - Get details of a specific artwork
 router.get('/:objectID', getArtworkDetails);
 
-// GET /api/artworks/artist/:artistName - Buscar por artista
+// GET /api/artworks/artist/:artistName - Search by artist
 router.get('/artist/:artistName', searchByArtist);
 
-// GET /api/artworks/department/:departmentId - Buscar por departamento
+// GET /api/artworks/department/:departmentId - Search by department
 router.get('/department/:departmentId', searchByDepartment);
 
 export default router;
