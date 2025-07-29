@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { MetAPI } from '../services/metAPI';
-import type { Department } from '../types/artwork';
+import type { Department, SearchParams } from '../types/artwork';
 
 interface SearchBarProps {
-  onSearch: (searchParams: unknown) => void;
+  onSearch: (searchParams: SearchParams) => void;
   isLoading?: boolean;
   onClear?: () => void;
-}
-
-interface ApiSearchParams {
-  hasImages: boolean;
-  q?: string;
-  artistOrCulture?: boolean;
-  dateBegin?: number;
-  dateEnd?: number;
-  medium?: string;
-  departmentId?: number;
 }
 
 export default function SearchBar({ onSearch, isLoading = false, onClear }: SearchBarProps) {
@@ -58,7 +48,7 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const params: ApiSearchParams = {
+    const params: SearchParams = {
       hasImages: true,
     };
 
