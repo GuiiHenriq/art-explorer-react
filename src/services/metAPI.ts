@@ -56,8 +56,11 @@ export const MetAPI = {
     return response.data;
   },
 
-  async getArtworksBatch(objectIDs: number[]): Promise<BatchResponse> {
-    const response = await api.post('/artworks/batch', { objectIDs });
+  async getArtworksBatch(
+    objectIDs: number[],
+    filterImages: boolean = false,
+  ): Promise<BatchResponse> {
+    const response = await api.post('/artworks/batch', { objectIDs, filterImages });
     return {
       data: response.data.data || response.data,
       rateLimitInfo: response.data.rateLimitInfo,

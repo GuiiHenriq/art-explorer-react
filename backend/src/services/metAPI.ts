@@ -46,21 +46,32 @@ class MetAPIService {
   async searchArtworks(params: SearchParams = {}): Promise<SearchResponse> {
     const { hasImages = true, q = 'painting', ...otherParams } = params;
 
-    const searchParams = new URLSearchParams({
-      hasImages: hasImages.toString(),
-      q,
-      ...Object.entries(otherParams).reduce(
-        (acc, [key, value]) => {
-          if (value !== undefined && value !== null) {
-            acc[key] = value.toString();
-          }
-          return acc;
-        },
-        {} as Record<string, string>,
-      ),
+    const isArtistSearch = otherParams.artistOrCulture === true;
+    
+    const searchParamsObject: Record<string, string> = {};
+    
+    if (otherParams.artistOrCulture !== undefined) {
+      searchParamsObject.artistOrCulture = otherParams.artistOrCulture.toString();
+    }
+    
+    searchParamsObject.q = q;
+    
+    if (!isArtistSearch) {
+      searchParamsObject.hasImages = hasImages.toString();
+    }
+    
+    Object.entries(otherParams).forEach(([key, value]) => {
+      if (key !== 'artistOrCulture' && value !== undefined && value !== null) {
+        searchParamsObject[key] = value.toString();
+      }
     });
 
-    const response = await this.api.get(`/search?${searchParams}`);
+    const searchParams = new URLSearchParams(searchParamsObject);
+    const fullUrl = `/search?${searchParams}`;
+
+    const response = await this.api.get(fullUrl);
+    
+    return response.data;
     return response.data;
   }
 

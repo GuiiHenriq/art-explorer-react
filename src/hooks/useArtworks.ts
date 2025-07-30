@@ -22,6 +22,7 @@ export const useArtworks = (): UseArtworksReturn => {
   const [objectIDs, setObjectIDs] = useState<number[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [rateLimitWarning, setRateLimitWarning] = useState<string | null>(null);
+  const [isArtistSearch, setIsArtistSearch] = useState<boolean>(false);
 
   const fetchArtworksBatch = async (
     ids: number[],
@@ -29,7 +30,7 @@ export const useArtworks = (): UseArtworksReturn => {
     nextIndex: number,
   ) => {
     try {
-      const response = await MetAPI.getArtworksBatch(ids);
+      const response = await MetAPI.getArtworksBatch(ids, isArtistSearch);
 
       if (response.rateLimitInfo?.hasRateLimit) {
         const {
@@ -64,6 +65,9 @@ export const useArtworks = (): UseArtworksReturn => {
     setArtworks([]);
     setCurrentIndex(0);
     setHasMore(false);
+
+    const isArtistSearchNow = params.artistOrCulture === true;
+    setIsArtistSearch(isArtistSearchNow);
 
     try {
       const response = await MetAPI.searchArtworks(params);

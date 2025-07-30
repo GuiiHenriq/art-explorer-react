@@ -3,18 +3,44 @@ import { metAPIService } from '../services/metAPI';
 import { ApiResponse, SearchParams } from '../types/artwork';
 import { asyncHandler } from '../middleware/errorHandler';
 
+const parseQueryParams = (query: any, paramConfig: Record<string, (value: string) => any>): Record<string, any> => {
+  const result: Record<string, any> = {};
+  
+  for (const [key, transformer] of Object.entries(paramConfig)) {
+    const value = query[key];
+    if (value) {
+      const transformed = transformer(value);
+      if (transformed !== undefined) {
+        result[key] = transformed;
+      }
+    }
+  }
+  
+  return result;
+};
+
 export const searchArtworks = asyncHandler(
   async (req: Request, res: Response<ApiResponse<any>>): Promise<void> => {
     const searchParams: SearchParams = {
       hasImages: req.query.hasImages === 'true',
       q: req.query.q as string,
+      ...parseQueryParams(req.query, {
+        artistOrCulture: (value: string) => value === 'true',
+        dateBegin: (value: string) => {
+          const num = parseInt(value, 10);
+          return isNaN(num) ? undefined : num;
+        },
+        dateEnd: (value: string) => {
+          const num = parseInt(value, 10);
+          return isNaN(num) ? undefined : num;
+        },
+        medium: (value: string) => value,
+        departmentId: (value: string) => {
+          const num = parseInt(value, 10);
+          return isNaN(num) ? undefined : num;
+        },
+      })
     };
-
-    Object.keys(searchParams).forEach(key => {
-      if (searchParams[key as keyof SearchParams] === undefined) {
-        delete searchParams[key as keyof SearchParams];
-      }
-    });
 
     const result = await metAPIService.searchArtworks(searchParams);
 
@@ -116,7 +142,7 @@ export const searchByDepartment = asyncHandler(
 
 export const getArtworksBatch = asyncHandler(
   async (req: Request, res: Response<ApiResponse<any>>): Promise<void> => {
-    const { objectIDs } = req.body;
+    const { objectIDs, filterImages = false } = req.body;
 
     if (!objectIDs || !Array.isArray(objectIDs)) {
       res.status(400).json({
@@ -143,15 +169,21 @@ export const getArtworksBatch = asyncHandler(
     let failedBatches = 0;
     const totalBatches = Math.ceil(objectIDs.length / BATCH_SIZE);
 
+    console.log(`🎨 Processing ${objectIDs.length} artworks in ${totalBatches} batches${filterImages ? ' (filtering images)' : ''}`);
+
     for (let i = 0; i < objectIDs.length; i += BATCH_SIZE) {
       const batchIds = objectIDs.slice(i, i + BATCH_SIZE);
       const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-      
-      console.log(`Processing batch ${batchNumber}/${totalBatches}: IDs ${batchIds.join(', ')}`);
 
       const batchPromises = batchIds.map(async (id: number) => {
         try {
-          return await metAPIService.getArtworkDetails(id);
+          const artwork = await metAPIService.getArtworkDetails(id);
+          
+          if (filterImages && (!artwork.primaryImage || artwork.primaryImage.trim() === '')) {
+            return null;
+          }
+          
+          return artwork;
         } catch (error: any) {
           console.error(`Failed to fetch artwork ${id}:`, error?.message || error);
           

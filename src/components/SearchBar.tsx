@@ -60,9 +60,13 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
       params.q = searchParams.q.trim();
     }
 
-    if (searchParams.artistName.trim()) {
+    if (searchParams.artistName.trim() && !searchParams.departmentId) {
       params.artistOrCulture = true;
       params.q = searchParams.artistName.trim();
+    } else if (searchParams.artistName.trim() && searchParams.departmentId) {
+      const artistQuery = searchParams.artistName.trim();
+      const baseQuery = searchParams.q.trim() || 'painting';
+      params.q = `${baseQuery} ${artistQuery}`;
     }
 
     if (searchParams.dateBegin) {
@@ -79,6 +83,9 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
 
     if (searchParams.departmentId) {
       params.departmentId = parseInt(searchParams.departmentId);
+      if (!params.q) {
+        params.q = 'portrait';
+      }
     }
 
     onSearch(params);
