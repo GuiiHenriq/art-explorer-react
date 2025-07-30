@@ -9,6 +9,9 @@ export const config = {
   },
   cors: {
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
+    allowedOrigins: process.env.NODE_ENV === 'production' 
+      ? (process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['https://art-explorer-guierba.vercel.app'])
+      : ['http://localhost:5173', 'http://localhost:3000'],
   },
   api: {
     metBaseUrl: process.env.MET_API_BASE_URL || 'https://collectionapi.metmuseum.org/public/collection/v1',

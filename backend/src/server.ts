@@ -12,7 +12,7 @@ const app = express();
 app.use(helmet());
 
 app.use(cors({
-  origin: config.cors.frontendUrl,
+  origin: config.cors.allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -54,11 +54,12 @@ app.use(errorHandler);
 
 const startServer = () => {
   try {
-    app.listen(config.server.port, () => {
+    const host = config.server.nodeEnv === 'production' ? '0.0.0.0' : 'localhost';
+    app.listen(config.server.port, host, () => {
       console.log(`🚀 Server running on port ${config.server.port}`);
       console.log(`🌍 Environment: ${config.server.nodeEnv}`);
-      console.log(`🔗 Health check: http://localhost:${config.server.port}/health`);
-      console.log(`📡 API Base URL: http://localhost:${config.server.port}/api`);
+      console.log(`🔗 Health check: http://${host}:${config.server.port}/health`);
+      console.log(`📡 API Base URL: http://${host}:${config.server.port}/api`);
     });
   } catch (error) {
     console.error('❌ Error starting server:', error);
