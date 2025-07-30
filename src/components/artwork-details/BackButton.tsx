@@ -21,11 +21,14 @@ export const BackButton = ({ onClick }: BackButtonProps) => (
   >
     <button
       onClick={onClick}
-      className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg px-3 py-2 hover:bg-gray-50"
-      aria-label="Go back to the previous page"
+      className="group cursor-pointer flex items-center gap-3 text-slate-600 hover:text-amber-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 rounded-none px-4 py-3 hover:bg-slate-50 border-l-4 border-transparent hover:border-amber-500"
+      aria-label="Back"
     >
-      <ArrowLeft size={20} />
-      <span className="font-medium">Back</span>
+      <ArrowLeft
+        size={20}
+        className="group-hover:-translate-x-1 transition-transform duration-300"
+      />
+      <span className="font-serif font-medium tracking-wide">Back</span>
     </button>
   </motion.div>
 );

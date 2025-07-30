@@ -9,8 +9,8 @@ interface ExternalLinkButtonProps {
 const ANIMATION_VARIANTS = {
   fadeInUp: {
     initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 }
-  }
+    animate: { opacity: 1, y: 0 },
+  },
 } as const;
 
 export const ExternalLinkButton = ({ url, delay }: ExternalLinkButtonProps) => {
@@ -19,22 +19,18 @@ export const ExternalLinkButton = ({ url, delay }: ExternalLinkButtonProps) => {
   };
 
   return (
-    <motion.div
+    <motion.button
       variants={ANIMATION_VARIANTS.fadeInUp}
       initial="initial"
       animate="animate"
       transition={{ delay }}
-      className="pt-4"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={handleExternalLink}
+      className="w-full group flex items-center justify-center gap-4 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-amber-600 hover:to-amber-700 text-white px-6 py-4 border-2 border-slate-600 hover:border-amber-500 font-serif font-medium tracking-wide transition-all duration-500 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
     >
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={handleExternalLink}
-        className="flex items-center gap-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      >
-        <ExternalLink size={20} />
-        <span>View more</span>
-      </motion.button>
-    </motion.div>
+      <ExternalLink size={20} className="group-hover:rotate-12 transition-transform duration-300" />
+      <span>View in Museum</span>
+    </motion.button>
   );
-}; 
+};

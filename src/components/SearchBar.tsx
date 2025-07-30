@@ -108,101 +108,116 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
-      <form onSubmit={handleSearch} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="bg-gradient-to-r from-slate-50 to-amber-50/50 border-2 border-slate-200 shadow-lg p-6 sm:p-8 mb-12 backdrop-blur-sm">
+      <form onSubmit={handleSearch} className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search by title or description
+            <label
+              htmlFor="search"
+              className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+            >
+              Search Collection
             </label>
             <input
               type="text"
               id="search"
               value={searchParams.q}
               onChange={(e) => handleInputChange('q', e.target.value)}
-              placeholder="Ex: Mona Lisa, impressionism, landscape..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Mona Lisa, impressionism, landscape..."
+              className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide placeholder:text-slate-400"
             />
           </div>
 
           <div>
-            <label htmlFor="artist" className="block text-sm font-medium text-gray-700 mb-2">
-              Artist
+            <label
+              htmlFor="artist"
+              className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+            >
+              Artist Name
             </label>
             <input
               type="text"
               id="artist"
               value={searchParams.artistName}
               onChange={(e) => handleInputChange('artistName', e.target.value)}
-              placeholder="Ex: Vincent van Gogh, Picasso..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Vincent van Gogh, Picasso..."
+              className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide placeholder:text-slate-400"
             />
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
           <button
             type="button"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium self-start"
+            className="text-amber-700 hover:text-amber-800 text-sm font-serif font-medium self-start transition-colors duration-300 border-b border-transparent hover:border-amber-600 pb-1"
           >
-            {showAdvanced ? 'Hide' : 'Show'} advanced search
+            {showAdvanced ? 'Hide' : 'Show'} Advanced Search
           </button>
 
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleClear}
-              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 text-slate-600 border-2 border-slate-300 bg-white/80 hover:bg-slate-50 hover:border-slate-400 transition-all duration-300 font-serif tracking-wide"
             >
-              Clear
+              Clear Search
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-gradient-to-r from-slate-700 to-slate-800 hover:from-amber-600 hover:to-amber-700 text-white border-2 border-slate-600 hover:border-amber-500 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed font-serif tracking-wide shadow-lg"
             >
-              {isLoading ? 'Searching...' : 'Search'}
+              {isLoading ? 'Searching Collection...' : 'Search Gallery'}
             </button>
           </div>
         </div>
 
         {showAdvanced && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t-2 border-amber-200/50">
             <div>
-              <label htmlFor="dateBegin" className="block text-sm font-medium text-gray-700 mb-2">
-                Initial date
+              <label
+                htmlFor="dateBegin"
+                className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+              >
+                Period Start
               </label>
               <input
                 type="number"
                 id="dateBegin"
                 value={searchParams.dateBegin}
                 onChange={(e) => handleInputChange('dateBegin', e.target.value)}
-                placeholder="Ex: 1800"
+                placeholder="1800"
                 min="0"
                 max="2024"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide placeholder:text-slate-400"
               />
             </div>
 
             <div>
-              <label htmlFor="dateEnd" className="block text-sm font-medium text-gray-700 mb-2">
-                Final date
+              <label
+                htmlFor="dateEnd"
+                className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+              >
+                Period End
               </label>
               <input
                 type="number"
                 id="dateEnd"
                 value={searchParams.dateEnd}
                 onChange={(e) => handleInputChange('dateEnd', e.target.value)}
-                placeholder="Ex: 1900"
+                placeholder="1900"
                 min="0"
                 max="2024"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide placeholder:text-slate-400"
               />
             </div>
 
             <div className="sm:col-span-2 lg:col-span-1">
-              <label htmlFor="medium" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="medium"
+                className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+              >
                 Technique
               </label>
               <input
@@ -210,23 +225,26 @@ export default function SearchBar({ onSearch, isLoading = false, onClear }: Sear
                 id="medium"
                 value={searchParams.medium}
                 onChange={(e) => handleInputChange('medium', e.target.value)}
-                placeholder="Ex: Oil on canvas, Bronze..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Oil on canvas, Bronze..."
+                className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide placeholder:text-slate-400"
               />
             </div>
 
             <div className="sm:col-span-2 lg:col-span-3">
-              <label htmlFor="department" className="block text-sm font-medium text-gray-700 mb-2">
-                Department
+              <label
+                htmlFor="department"
+                className="block text-sm font-serif font-medium text-slate-700 mb-3 tracking-wide"
+              >
+                Museum Department
               </label>
               <select
                 id="department"
                 value={searchParams.departmentId}
                 onChange={(e) => handleInputChange('departmentId', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border-2 border-slate-200 bg-white/80 focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-all duration-300 font-light tracking-wide"
                 disabled={loadingDepartments}
               >
-                <option value="">All departments</option>
+                <option value="">All Museum Departments</option>
                 {departments.map((dept) => (
                   <option key={dept.departmentId} value={dept.departmentId}>
                     {dept.displayName}

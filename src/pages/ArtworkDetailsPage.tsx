@@ -11,7 +11,6 @@ import {
   ArtworkImage,
   InfoSection,
   AdditionalDetails,
-  ExternalLinkButton,
 } from '../components/artwork-details';
 import type { Artwork } from '../types/artwork';
 
@@ -80,7 +79,7 @@ export default function ArtworkDetailsPage() {
       {
         condition: artwork.medium,
         icon: Palette,
-        label: 'Technique',
+        label: 'Medium',
         value: artwork.medium!,
         gradient: 'bg-gradient-to-br from-orange-500 to-red-500',
         delay: 1.2,
@@ -98,8 +97,13 @@ export default function ArtworkDetailsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-64">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-amber-50/30">
+        <div className="flex justify-center items-center min-h-96 pt-20">
+          <div className="text-center">
+            <LoadingSpinner />
+            <p className="mt-6 text-slate-600 font-serif text-lg">Loading artwork details...</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -109,57 +113,88 @@ export default function ArtworkDetailsPage() {
   }
 
   return (
-    <div className="w-full">
-      <BackButton onClick={handleBack} />
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-slate-50 to-amber-50/30">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <BackButton onClick={handleBack} />
 
-      <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
         <motion.div
-          variants={ANIMATION_VARIANTS.fadeInLeft}
+          variants={ANIMATION_VARIANTS.fadeInDown}
           initial="initial"
           animate="animate"
           transition={{ delay: 0.2 }}
-          className="sticky top-8"
+          className="text-center mb-16"
         >
-          <ArtworkImage
-            artwork={artwork}
-            isFavorite={isFavorite}
-            onToggleFavorite={handleToggleFavorite}
-            onImageError={handleImageError}
-          />
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-light mb-6 leading-tight text-slate-800 tracking-wide max-w-4xl mx-auto">
+            {artwork.title}
+          </h1>
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent flex-1 max-w-32" />
+            <div className="w-3 h-3 bg-amber-500 rounded-full mx-4" />
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent flex-1 max-w-32" />
+          </div>
+          {artwork.artistDisplayName && (
+            <p className="text-xl font-serif italic text-slate-600 tracking-wide">
+              by {artwork.artistDisplayName}
+            </p>
+          )}
         </motion.div>
 
-        <motion.div
-          variants={ANIMATION_VARIANTS.fadeInRight}
-          initial="initial"
-          animate="animate"
-          transition={{ delay: 0.4 }}
-          className="space-y-8 lg:pl-4"
-        >
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-16">
           <motion.div
-            variants={ANIMATION_VARIANTS.fadeInUp}
+            variants={ANIMATION_VARIANTS.fadeInLeft}
+            initial="initial"
+            animate="animate"
+            transition={{ delay: 0.4 }}
+            className="xl:col-span-2"
+          >
+            <ArtworkImage
+              artwork={artwork}
+              isFavorite={isFavorite}
+              onToggleFavorite={handleToggleFavorite}
+              onImageError={handleImageError}
+            />
+          </motion.div>
+
+          <motion.div
+            variants={ANIMATION_VARIANTS.fadeInRight}
             initial="initial"
             animate="animate"
             transition={{ delay: 0.6 }}
+            className="xl:col-span-1 space-y-8"
           >
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight text-gray-900">
-              {artwork.title}
-            </h1>
+            <div className="bg-gradient-to-b from-slate-50 to-amber-50/50 border-2 border-slate-200 p-8 shadow-lg">
+              <div className="flex items-center justify-center mb-6">
+                <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent flex-1 max-w-16" />
+                <h2 className="px-4 text-lg font-serif font-medium text-slate-700 tracking-wide">
+                  Artwork Details
+                </h2>
+                <div className="h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent flex-1 max-w-16" />
+              </div>
+
+              <div className="space-y-6">
+                {mainInfoSections.map((section) => (
+                  <InfoSection
+                    key={section.label}
+                    icon={section.icon}
+                    label={section.label}
+                    value={section.value}
+                    description={section.description}
+                    gradient={section.gradient}
+                    delay={section.delay}
+                  />
+                ))}
+              </div>
+            </div>
           </motion.div>
+        </div>
 
-          {mainInfoSections.map((section) => (
-            <InfoSection
-              key={section.label}
-              icon={section.icon}
-              label={section.label}
-              value={section.value}
-              description={section.description}
-              gradient={section.gradient}
-              delay={section.delay}
-            />
-          ))}
-
-          {artwork.objectURL && <ExternalLinkButton url={artwork.objectURL} delay={1.6} />}
-
+        <motion.div
+          variants={ANIMATION_VARIANTS.fadeInUp}
+          initial="initial"
+          animate="animate"
+          transition={{ delay: 2.0 }}
+          className="mt-20"
+        >
           <AdditionalDetails artwork={artwork} />
         </motion.div>
       </div>
