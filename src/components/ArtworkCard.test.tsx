@@ -7,6 +7,7 @@
  * - Prevents event propagation on favorite button clicks
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ArtworkCard from './ArtworkCard';
@@ -73,7 +74,7 @@ describe('ArtworkCard', () => {
     const user = userEvent.setup();
     render(<ArtworkCard {...mockProps} />);
 
-    const favoriteButton = screen.getByRole('button', { name: /add to favorites/i });
+    const favoriteButton = screen.getByRole('button', { name: /add to collection/i });
     await user.click(favoriteButton);
 
     expect(mockProps.onToggleFavorite).toHaveBeenCalledWith(mockArtwork);
@@ -83,7 +84,7 @@ describe('ArtworkCard', () => {
   it('shows correct favorite button state when favorited', () => {
     render(<ArtworkCard {...mockProps} isFavorite={true} />);
 
-    const favoriteButton = screen.getByRole('button', { name: /remove from favorites/i });
-    expect(favoriteButton).toHaveClass('bg-red-500', 'text-white');
+    const favoriteButton = screen.getByRole('button', { name: /remove from collection/i });
+    expect(favoriteButton).toHaveClass('bg-amber-600/90', 'text-slate-100');
   });
 });

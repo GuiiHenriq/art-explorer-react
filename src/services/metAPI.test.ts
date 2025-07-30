@@ -7,6 +7,14 @@
  * • Network and HTTP error handling
  */
 
+jest.mock('../config/environment', () => ({
+  config: {
+    apiBaseUrl: 'http://localhost:3003/api',
+    isDevelopment: true,
+    isProduction: false,
+  },
+}));
+
 const mockGet = jest.fn();
 const mockPost = jest.fn();
 
@@ -47,7 +55,10 @@ describe('MetAPI Service', () => {
 
     const result = await MetAPI.getArtworksBatch([1, 2]);
 
-    expect(mockPost).toHaveBeenCalledWith('/artworks/batch', { objectIDs: [1, 2] });
+    expect(mockPost).toHaveBeenCalledWith('/artworks/batch', {
+      objectIDs: [1, 2],
+      filterImages: false,
+    });
     expect(result.rateLimitInfo?.hasRateLimit).toBe(true);
   });
 

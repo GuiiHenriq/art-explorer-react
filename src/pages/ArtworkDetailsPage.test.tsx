@@ -6,6 +6,7 @@
  * • Error state displays error message
  */
 
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
@@ -37,6 +38,29 @@ jest.mock('../store/useStore', () => ({
 
 jest.mock('../hooks/useArtworkDetails', () => ({
   useArtworkDetails: () => mockUseArtworkDetails(),
+}));
+
+jest.mock('../components/LoadingSpinner', () => {
+  return function MockLoadingSpinner() {
+    return <div>Loading...</div>;
+  };
+});
+
+jest.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.ComponentProps<'div'>) => {
+      const { ...domProps } = props;
+      return <div {...domProps}>{children}</div>;
+    },
+    button: ({ children, ...props }: React.ComponentProps<'button'>) => {
+      const { ...domProps } = props;
+      return <button {...domProps}>{children}</button>;
+    },
+    p: ({ children, ...props }: React.ComponentProps<'p'>) => {
+      const { ...domProps } = props;
+      return <p {...domProps}>{children}</p>;
+    },
+  },
 }));
 
 describe('ArtworkDetailsPage', () => {
@@ -76,7 +100,7 @@ describe('ArtworkDetailsPage', () => {
       error: 'Failed to load artwork',
     });
     renderPage();
-    expect(screen.getByRole('heading', { name: /error/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /artwork unavailable/i })).toBeInTheDocument();
     expect(screen.getByText('Failed to load artwork')).toBeInTheDocument();
   });
 });

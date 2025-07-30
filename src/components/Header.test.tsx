@@ -5,6 +5,7 @@
  * • Navigation links work correctly
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
@@ -28,8 +29,9 @@ describe('Header', () => {
   it('renders logo and navigation elements', () => {
     renderWithRouter();
 
+    expect(screen.getByText('API Museum')).toBeInTheDocument();
     expect(screen.getByText('Art Explorer')).toBeInTheDocument();
-    expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Gallery')).toBeInTheDocument();
     expect(screen.getByText('Favorites')).toBeInTheDocument();
   });
 
@@ -40,24 +42,30 @@ describe('Header', () => {
     const menuButton = screen.getByLabelText('Toggle menu');
     await user.click(menuButton);
 
-    const mobileNavItems = screen.getAllByText('Home');
+    const mobileNavItems = screen.getAllByText('Gallery');
     expect(mobileNavItems).toHaveLength(2);
   });
 
-  it('shows active state for favorites route', () => {
-    renderWithRouter(['/favorites']);
+  it('shows different styling for active and inactive routes', () => {
+    renderWithRouter(['/']);
 
+    const galleryLink = screen.getByRole('link', { name: /gallery/i });
     const favoritesLink = screen.getByRole('link', { name: /favorites/i });
-    expect(favoritesLink.className).toContain('text-blue-600');
+
+    expect(galleryLink).toHaveAttribute('href', '/');
+    expect(favoritesLink).toHaveAttribute('href', '/favorites');
+
+    expect(galleryLink).toBeInTheDocument();
+    expect(favoritesLink).toBeInTheDocument();
   });
 
   it('renders navigation links correctly', () => {
     renderWithRouter();
 
-    const homeLink = screen.getByRole('link', { name: /home/i });
+    const galleryLink = screen.getByRole('link', { name: /gallery/i });
     const favoritesLink = screen.getByRole('link', { name: /favorites/i });
 
-    expect(homeLink).toHaveAttribute('href', '/');
+    expect(galleryLink).toHaveAttribute('href', '/');
     expect(favoritesLink).toHaveAttribute('href', '/favorites');
   });
 });

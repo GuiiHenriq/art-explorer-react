@@ -106,7 +106,7 @@ describe('HomePage', () => {
     renderWithRouter(<HomePage />);
 
     expect(screen.getByText('Mona Lisa')).toBeInTheDocument();
-    expect(screen.getByText('Search results (1 artwork found)')).toBeInTheDocument();
+    expect(screen.getByText('1 artwork currently on display')).toBeInTheDocument();
   });
 
   it('navigates to artwork details when artwork is clicked', async () => {
@@ -145,7 +145,7 @@ describe('HomePage', () => {
     const user = userEvent.setup();
     renderWithRouter(<HomePage />);
 
-    await user.click(screen.getByText('Load more'));
+    await user.click(screen.getByText('View More Artworks'));
 
     expect(mockLoadMore).toHaveBeenCalledTimes(1);
   });

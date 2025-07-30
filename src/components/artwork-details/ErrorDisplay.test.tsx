@@ -5,6 +5,7 @@
  * • Shows proper error content based on error prop
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ErrorDisplay } from './ErrorDisplay';
@@ -20,7 +21,7 @@ describe('ErrorDisplay', () => {
   it('renders error title and message correctly', () => {
     render(<ErrorDisplay error={mockError} onBack={mockOnBack} />);
 
-    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('Artwork Unavailable')).toBeInTheDocument();
     expect(screen.getByText(mockError)).toBeInTheDocument();
   });
 

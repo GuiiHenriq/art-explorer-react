@@ -4,6 +4,14 @@ import { TextEncoder, TextDecoder } from 'util';
 
 Object.assign(global, { TextEncoder, TextDecoder });
 
+jest.mock('./config/environment', () => ({
+  config: {
+    apiBaseUrl: 'https://collectionapi.metmuseum.org/public/collection/v1',
+    isDevelopment: true,
+    isProduction: false,
+  },
+}));
+
 jest.mock('framer-motion', () => {
   const actual = jest.requireActual('framer-motion');
 

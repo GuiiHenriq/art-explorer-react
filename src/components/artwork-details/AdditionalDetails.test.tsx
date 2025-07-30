@@ -6,6 +6,7 @@
  * • Applies correct animations and styling classes
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { AdditionalDetails } from './AdditionalDetails';
 import type { Artwork } from '../../types/artwork';
@@ -19,6 +20,7 @@ const mockArtworkWithAllDetails: Artwork = {
   period: 'Classical Period',
   classification: 'Sculpture',
   creditLine: 'Gift of Anonymous Donor',
+  objectURL: 'https://example.com/artwork',
 };
 
 const mockArtworkWithPartialDetails: Artwork = {
@@ -47,14 +49,15 @@ describe('AdditionalDetails', () => {
   it('renders all details when artwork has complete information', () => {
     render(<AdditionalDetails artwork={mockArtworkWithAllDetails} />);
 
-    expect(screen.getByText('Culture')).toBeInTheDocument();
+    expect(screen.getByText('Cultural Origin')).toBeInTheDocument();
     expect(screen.getByText('Ancient Greek')).toBeInTheDocument();
-    expect(screen.getByText('Period')).toBeInTheDocument();
+    expect(screen.getByText('Historical Period')).toBeInTheDocument();
     expect(screen.getByText('Classical Period')).toBeInTheDocument();
-    expect(screen.getByText('Classification')).toBeInTheDocument();
+    expect(screen.getAllByText('Classification')).toHaveLength(2); // Title and label
     expect(screen.getByText('Sculpture')).toBeInTheDocument();
-    expect(screen.getByText('Credit')).toBeInTheDocument();
+    expect(screen.getByText('Museum Credit')).toBeInTheDocument();
     expect(screen.getByText('Gift of Anonymous Donor')).toBeInTheDocument();
+    expect(screen.getByText('View in Museum')).toBeInTheDocument();
   });
 
   it('filters out empty fields and renders only valid details', () => {
@@ -62,8 +65,8 @@ describe('AdditionalDetails', () => {
 
     expect(screen.getByText('Roman')).toBeInTheDocument();
     expect(screen.getByText('Museum Purchase')).toBeInTheDocument();
-    expect(screen.queryByText('Period')).not.toBeInTheDocument();
-    expect(screen.queryByText('Classification')).not.toBeInTheDocument();
+    expect(screen.queryByText('Historical Period')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sculpture')).not.toBeInTheDocument();
   });
 
   it('returns null when no valid details are available', () => {
@@ -75,7 +78,14 @@ describe('AdditionalDetails', () => {
   it('applies correct styling and structure', () => {
     render(<AdditionalDetails artwork={mockArtworkWithAllDetails} />);
 
-    const container = screen.getByText('Ancient Greek').closest('.space-y-4');
-    expect(container).toHaveClass('pt-6', 'border-t', 'border-gray-200', 'space-y-4');
+    const container = screen.getByText('Ancient Greek').closest('.grid');
+    expect(container).toHaveClass(
+      'grid',
+      'grid-cols-1',
+      'md:grid-cols-2',
+      'xl:grid-cols-4',
+      'gap-8',
+      'mb-10',
+    );
   });
 });

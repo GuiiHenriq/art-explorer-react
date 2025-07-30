@@ -6,6 +6,7 @@
  * • Calls onImageError callback when image error occurs
  */
 
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ArtworkImage } from './ArtworkImage';
@@ -43,7 +44,7 @@ describe('ArtworkImage', () => {
     const user = userEvent.setup();
     render(<ArtworkImage {...mockProps} />);
 
-    const favoriteButton = screen.getByRole('button', { name: /add to favorites/i });
+    const favoriteButton = screen.getByRole('button', { name: /add to collection/i });
     await user.click(favoriteButton);
 
     expect(mockProps.onToggleFavorite).toHaveBeenCalledTimes(1);
@@ -52,9 +53,9 @@ describe('ArtworkImage', () => {
   it('shows favorite button as active when isFavorite is true', () => {
     render(<ArtworkImage {...mockProps} isFavorite={true} />);
 
-    const favoriteButton = screen.getByRole('button', { name: /remove from favorites/i });
+    const favoriteButton = screen.getByRole('button', { name: /remove from collection/i });
     expect(favoriteButton).toBeInTheDocument();
-    expect(favoriteButton).toHaveClass('bg-red-500', 'text-white');
+    expect(favoriteButton).toHaveClass('bg-amber-600/90', 'text-slate-100');
   });
 
   it('displays fallback UI and calls onImageError when image fails to load', () => {
@@ -63,7 +64,7 @@ describe('ArtworkImage', () => {
     const image = screen.getByAltText('Test Artwork');
     fireEvent.error(image);
 
-    expect(screen.getByText('Image unavailable')).toBeInTheDocument();
+    expect(screen.getByText('Artwork Unavailable')).toBeInTheDocument();
     expect(mockProps.onImageError).toHaveBeenCalledTimes(1);
   });
 });

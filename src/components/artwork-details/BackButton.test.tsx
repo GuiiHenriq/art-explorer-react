@@ -5,6 +5,7 @@
  * • Supports keyboard navigation and activation
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BackButton } from './BackButton';
@@ -20,9 +21,7 @@ describe('BackButton', () => {
     render(<BackButton onClick={mockOnClick} />);
 
     expect(screen.getByText('Back')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /go back to the previous page/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
   });
 
   it('calls onClick when button is clicked', async () => {

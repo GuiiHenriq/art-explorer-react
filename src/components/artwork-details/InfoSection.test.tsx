@@ -5,6 +5,7 @@
  * • Hides description when not provided
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { Calendar } from 'lucide-react';
 import { InfoSection } from './InfoSection';
@@ -35,6 +36,6 @@ describe('InfoSection', () => {
   it('hides description when not provided', () => {
     render(<InfoSection {...mockProps} />);
 
-    expect(screen.queryByText(/description/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Created during the Impressionist period')).not.toBeInTheDocument();
   });
 });

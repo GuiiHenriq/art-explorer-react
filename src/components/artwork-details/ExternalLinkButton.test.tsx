@@ -5,6 +5,7 @@
  * • Supports keyboard navigation and activation
  */
 
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ExternalLinkButton } from './ExternalLinkButton';
@@ -27,7 +28,7 @@ describe('ExternalLinkButton', () => {
     render(<ExternalLinkButton url={mockUrl} delay={mockDelay} />);
 
     expect(screen.getByRole('button')).toBeInTheDocument();
-    expect(screen.getByText('View more')).toBeInTheDocument();
+    expect(screen.getByText('View in Museum')).toBeInTheDocument();
   });
 
   it('opens external URL when clicked', async () => {

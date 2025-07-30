@@ -6,6 +6,7 @@
  * • Clear functionality to reset form
  */
 
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SearchBar from './SearchBar';
@@ -33,10 +34,10 @@ describe('SearchBar', () => {
   it('renders search inputs and buttons correctly', async () => {
     render(<SearchBar onSearch={mockOnSearch} />);
 
-    expect(screen.getByLabelText(/search by title or description/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/artist/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^search$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/search collection/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/artist name/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /search gallery/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /clear search/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /show advanced search/i })).toBeInTheDocument();
 
     await waitFor(() => {
@@ -48,9 +49,9 @@ describe('SearchBar', () => {
     const user = userEvent.setup();
     render(<SearchBar onSearch={mockOnSearch} />);
 
-    const searchInput = screen.getByLabelText(/search by title or description/i);
-    const artistInput = screen.getByLabelText(/artist/i);
-    const searchButton = screen.getByRole('button', { name: /^search$/i });
+    const searchInput = screen.getByLabelText(/search collection/i);
+    const artistInput = screen.getByLabelText(/artist name/i);
+    const searchButton = screen.getByRole('button', { name: /search gallery/i });
 
     await user.type(searchInput, 'Mona Lisa');
     await user.type(artistInput, 'Leonardo');
@@ -69,12 +70,12 @@ describe('SearchBar', () => {
 
     const toggleButton = screen.getByRole('button', { name: /show advanced search/i });
 
-    expect(screen.queryByLabelText(/initial date/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/period start/i)).not.toBeInTheDocument();
 
     await user.click(toggleButton);
 
-    expect(screen.getByLabelText(/initial date/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/final date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/period start/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/period end/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/technique/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /hide advanced search/i })).toBeInTheDocument();
   });
@@ -83,8 +84,8 @@ describe('SearchBar', () => {
     const user = userEvent.setup();
     render(<SearchBar onSearch={mockOnSearch} onClear={mockOnClear} />);
 
-    const searchInput = screen.getByLabelText(/search by title or description/i);
-    const clearButton = screen.getByRole('button', { name: /clear/i });
+    const searchInput = screen.getByLabelText(/search collection/i);
+    const clearButton = screen.getByRole('button', { name: /clear search/i });
 
     await user.type(searchInput, 'test search');
     expect(searchInput).toHaveValue('test search');

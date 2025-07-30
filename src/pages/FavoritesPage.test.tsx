@@ -9,6 +9,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import '@testing-library/jest-dom';
 import FavoritesPage from './FavoritesPage';
 import { useStore } from '../store/useStore';
 import type { Artwork } from '../types/artwork';
@@ -68,9 +69,9 @@ describe('FavoritesPage', () => {
     mockUseStore.mockReturnValue({ favorites: [], toggleFavorite: jest.fn() } as MockStoreState);
     renderComponent();
 
-    expect(screen.getByRole('heading', { name: 'No favorites yet' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'No Favorites :(' })).toBeInTheDocument();
 
-    const exploreButton = screen.getByRole('button', { name: 'Explore Gallery' });
+    const exploreButton = screen.getByRole('button', { name: 'Explore the Gallery' });
     await userEvent.click(exploreButton);
     expect(mockNavigate).toHaveBeenCalledWith('/');
   });
@@ -82,8 +83,7 @@ describe('FavoritesPage', () => {
     } as MockStoreState);
     renderComponent();
 
-    expect(screen.getByText('1 favorite')).toBeInTheDocument();
-    expect(screen.getByText('1 artwork')).toBeInTheDocument();
+    expect(screen.getByText(/1 artwork in your personal collection/)).toBeInTheDocument();
   });
 
   it('renders favorites grid when artworks are available', async () => {
@@ -95,7 +95,7 @@ describe('FavoritesPage', () => {
 
     renderComponent();
 
-    expect(screen.getByText('2 favorites')).toBeInTheDocument();
+    expect(screen.getByText(/2 artworks in your personal collection/)).toBeInTheDocument();
     expect(screen.getByTestId('artwork-card-123')).toBeInTheDocument();
 
     const viewDetailsButton = screen.getAllByText('View Details')[0];
