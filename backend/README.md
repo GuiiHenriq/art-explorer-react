@@ -1,7 +1,5 @@
 # Art Explorer - Backend
 
-## 🚀 Deploy on Render
-
 ### Setup Instructions
 
 1. **Build Command**: `npm run build`
