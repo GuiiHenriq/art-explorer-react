@@ -5,7 +5,7 @@ export default function LoadingSpinner() {
     <div className="flex flex-col justify-center items-center p-8">
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
         className="relative"
       >
         <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full"></div>
@@ -17,7 +17,7 @@ export default function LoadingSpinner() {
         transition={{ delay: 0.5 }}
         className="text-white/70 mt-4 text-lg"
       >
-        Carregando obra de arte...
+        Loading...
       </motion.p>
     </div>
   );
