@@ -11,6 +11,7 @@ interface UseArtworksReturn {
   hasMore: boolean;
   search: (params: SearchParams) => void;
   loadMore: () => void;
+  rateLimitWarning: string | null;
 }
 
 export const useArtworks = (): UseArtworksReturn => {
@@ -20,6 +21,7 @@ export const useArtworks = (): UseArtworksReturn => {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [objectIDs, setObjectIDs] = useState<number[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [rateLimitWarning, setRateLimitWarning] = useState<string | null>(null);
 
   const fetchArtworksBatch = async (
     ids: number[],
@@ -27,8 +29,26 @@ export const useArtworks = (): UseArtworksReturn => {
     nextIndex: number,
   ) => {
     try {
-      const detailedArtworks = await Promise.all(ids.map((id) => MetAPI.getArtworkDetails(id)));
-      setArtworks((prev) => [...prev, ...detailedArtworks]);
+      const response = await MetAPI.getArtworksBatch(ids);
+
+      if (response.rateLimitInfo?.hasRateLimit) {
+        const {
+          successfulArtworks = 0,
+          requestedArtworks = 0,
+          failedBatches = 0,
+        } = response.rateLimitInfo;
+        const failedArtworks = requestedArtworks - successfulArtworks;
+
+        if (failedArtworks > 0) {
+          setRateLimitWarning(
+            `Rate limit reached! Only ${successfulArtworks} of ${requestedArtworks} artworks could be loaded. ${failedBatches} batch(es) failed due to too many requests. Please wait a moment before loading more.`,
+          );
+        }
+      } else {
+        setRateLimitWarning(null);
+      }
+
+      setArtworks((prev) => [...prev, ...response.data]);
       setHasMore(currentObjectIDs.length > nextIndex);
       setCurrentIndex(nextIndex);
     } catch {
@@ -73,5 +93,5 @@ export const useArtworks = (): UseArtworksReturn => {
     }
   }, [hasMore, loading, objectIDs, currentIndex]);
 
-  return { artworks, loading, error, hasMore, search, loadMore };
+  return { artworks, loading, error, hasMore, search, loadMore, rateLimitWarning };
 };

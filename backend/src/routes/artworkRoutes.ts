@@ -5,12 +5,16 @@ import {
   getDepartments,
   searchByArtist,
   searchByDepartment,
+  getArtworksBatch,
 } from '../controllers/artworkController';
 
 const router = Router();
 
 // GET /api/artworks/search - Search for artworks
 router.get('/search', searchArtworks);
+
+// POST /api/artworks/batch - Get multiple artworks in batches
+router.post('/batch', getArtworksBatch);
 
 // GET /api/artworks/departments - List departments
 router.get('/departments', getDepartments);

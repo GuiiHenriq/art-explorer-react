@@ -1,5 +1,11 @@
 import axios from 'axios';
-import type { Artwork, SearchResponse, Department, SearchParams } from '../types/artwork';
+import type {
+  Artwork,
+  SearchResponse,
+  Department,
+  SearchParams,
+  BatchResponse,
+} from '../types/artwork';
 
 const BASE_URL = 'http://localhost:3003/api';
 
@@ -48,6 +54,14 @@ export const MetAPI = {
   async searchArtworks(params: SearchParams = {}): Promise<SearchResponse> {
     const response = await api.get('/artworks/search', { params });
     return response.data;
+  },
+
+  async getArtworksBatch(objectIDs: number[]): Promise<BatchResponse> {
+    const response = await api.post('/artworks/batch', { objectIDs });
+    return {
+      data: response.data.data || response.data,
+      rateLimitInfo: response.data.rateLimitInfo,
+    };
   },
 
   async getArtworkDetails(objectID: number): Promise<Artwork> {

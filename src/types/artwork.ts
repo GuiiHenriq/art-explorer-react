@@ -48,6 +48,17 @@ export interface Department {
   displayName: string;
 }
 
+export interface BatchResponse {
+  data: Artwork[];
+  rateLimitInfo?: {
+    hasRateLimit: boolean;
+    failedBatches: number;
+    totalBatches: number;
+    successfulArtworks?: number;
+    requestedArtworks?: number;
+  };
+}
+
 export interface SearchParams {
   hasImages?: boolean;
   isOnView?: boolean;

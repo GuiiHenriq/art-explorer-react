@@ -66,4 +66,11 @@ export interface ApiResponse<T> {
   data?: T;
   error?: string;
   message?: string;
+  rateLimitInfo?: {
+    hasRateLimit: boolean;
+    failedBatches: number;
+    totalBatches: number;
+    successfulArtworks?: number;
+    requestedArtworks?: number;
+  };
 }

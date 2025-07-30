@@ -114,3 +114,96 @@ export const searchByDepartment = asyncHandler(
   }
 );
 
+export const getArtworksBatch = asyncHandler(
+  async (req: Request, res: Response<ApiResponse<any>>): Promise<void> => {
+    const { objectIDs } = req.body;
+
+    if (!objectIDs || !Array.isArray(objectIDs)) {
+      res.status(400).json({
+        success: false,
+        error: 'Object IDs are required',
+        message: 'Provide a valid array of object IDs',
+      });
+      return;
+    }
+
+    if (objectIDs.length === 0) {
+      res.json({
+        success: true,
+        data: [],
+        message: 'No object IDs provided',
+        rateLimitInfo: { hasRateLimit: false, failedBatches: 0, totalBatches: 0 }
+      });
+      return;
+    }
+
+    const BATCH_SIZE = 5; // 3 batches of 5 artworks each
+    const artworks = [];
+    let rateLimitHit = false;
+    let failedBatches = 0;
+    const totalBatches = Math.ceil(objectIDs.length / BATCH_SIZE);
+
+    for (let i = 0; i < objectIDs.length; i += BATCH_SIZE) {
+      const batchIds = objectIDs.slice(i, i + BATCH_SIZE);
+      const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
+      
+      console.log(`Processing batch ${batchNumber}/${totalBatches}: IDs ${batchIds.join(', ')}`);
+
+      const batchPromises = batchIds.map(async (id: number) => {
+        try {
+          return await metAPIService.getArtworkDetails(id);
+        } catch (error: any) {
+          console.error(`Failed to fetch artwork ${id}:`, error?.message || error);
+          
+          if (error?.message?.includes('403') || error?.message?.includes('Too many requests')) {
+            rateLimitHit = true;
+          }
+          
+          return null;
+        }
+      });
+
+      try {
+        const results = await Promise.all(batchPromises);
+        
+        const validResults = results.filter(item => item !== null);
+        
+        if (validResults.length === 0 && batchIds.length > 0) {
+          failedBatches++;
+          rateLimitHit = true;
+          console.warn(`Batch ${batchNumber} completely failed - likely rate limited`);
+          
+          break;
+        }
+        
+        artworks.push(...validResults);
+
+        if (i + BATCH_SIZE < objectIDs.length) {
+          await new Promise(resolve => setTimeout(resolve, 800)); // 800ms - Delay between batches
+        }
+      } catch (error) {
+        console.error(`Error processing batch ${batchNumber}:`, error);
+        failedBatches++;
+        rateLimitHit = true;
+        
+        break;
+      }
+    }
+
+    res.json({
+      success: true,
+      data: artworks,
+      message: artworks.length > 0 
+        ? `${artworks.length} artworks retrieved successfully` 
+        : 'No artworks could be retrieved',
+      rateLimitInfo: {
+        hasRateLimit: rateLimitHit,
+        failedBatches,
+        totalBatches,
+        successfulArtworks: artworks.length,
+        requestedArtworks: objectIDs.length
+      }
+    });
+  }
+);
+
