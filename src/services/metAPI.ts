@@ -6,8 +6,9 @@ import type {
   SearchParams,
   BatchResponse,
 } from '../types/artwork';
+import { config } from '../config/environment';
 
-const BASE_URL = 'http://localhost:3003/api';
+const BASE_URL = config.apiBaseUrl;
 
 const api = axios.create({
   baseURL: BASE_URL,
