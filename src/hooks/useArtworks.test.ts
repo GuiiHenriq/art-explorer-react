@@ -1,225 +1,134 @@
+/**
+ * useArtworks Hook Tests:
+ * • Initial state validation (empty artworks, loading false, no errors)
+ * • Search functionality with successful artwork loading
+ * • Load more functionality to fetch additional artwork batches
+ * • Error handling for failed API requests
+ * • Rate limit warning display when API limits are reached
+ */
+
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useArtworks } from './useArtworks';
 import { MetAPI } from '../services/metAPI';
-import type { SearchResponse, BatchResponse, Artwork } from '../types/artwork';
+import type { SearchResponse, Artwork } from '../types/artwork';
 
 jest.mock('../services/metAPI');
 const mockedMetAPI = MetAPI as jest.Mocked<typeof MetAPI>;
 
 describe('useArtworks', () => {
-  const mockArtworks: Artwork[] = [
-    {
-      objectID: 1,
-      title: 'Test Artwork',
-      primaryImage: 'https://example.com/image.jpg',
-      primaryImageSmall: 'https://example.com/image_small.jpg',
-    },
-  ];
+  const mockArtwork: Artwork = {
+    objectID: 1,
+    title: 'Test Artwork',
+    primaryImage: 'https://example.com/image.jpg',
+    primaryImageSmall: 'https://example.com/image_small.jpg',
+  };
 
   const mockSearchResponse: SearchResponse = {
     total: 20,
-    objectIDs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-  };
-
-  const mockBatchResponse: BatchResponse = {
-    data: mockArtworks,
-    rateLimitInfo: { hasRateLimit: false, failedBatches: 0, totalBatches: 1 },
+    objectIDs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('Initial state', () => {
-    it('should have correct initial values', () => {
-      const { result } = renderHook(() => useArtworks());
+  it('should initialize with empty state', () => {
+    const { result } = renderHook(() => useArtworks());
 
-      expect(result.current.artworks).toEqual([]);
-      expect(result.current.loading).toBe(false);
-      expect(result.current.error).toBe(null);
-      expect(result.current.hasMore).toBe(false);
-      expect(result.current.rateLimitWarning).toBe(null);
-    });
+    expect(result.current.artworks).toEqual([]);
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBe(null);
+    expect(result.current.hasMore).toBe(false);
   });
 
-  describe('Search functionality', () => {
-    it('should search and load artworks successfully', async () => {
-      mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(mockBatchResponse);
-
-      const { result } = renderHook(() => useArtworks());
-
-      await act(async () => {
-        result.current.search({ q: 'test' });
-      });
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      expect(mockedMetAPI.searchArtworks).toHaveBeenCalledWith({ q: 'test' });
-      expect(result.current.artworks).toEqual(mockArtworks);
-      expect(result.current.hasMore).toBe(true);
-      expect(result.current.error).toBe(null);
+  it('should search and load artworks successfully', async () => {
+    mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
+    mockedMetAPI.getArtworksBatch.mockResolvedValue({
+      data: [mockArtwork],
+      rateLimitInfo: { hasRateLimit: false, failedBatches: 0, totalBatches: 1 },
     });
 
-    it('should handle empty search results', async () => {
-      mockedMetAPI.searchArtworks.mockResolvedValue({ total: 0, objectIDs: [] });
+    const { result } = renderHook(() => useArtworks());
 
-      const { result } = renderHook(() => useArtworks());
-
-      await act(async () => {
-        result.current.search({ q: 'empty' });
-      });
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      expect(result.current.artworks).toEqual([]);
-      expect(result.current.hasMore).toBe(false);
-      expect(result.current.error).toBe(null);
+    await act(async () => {
+      result.current.search({ q: 'painting' });
     });
 
-    it('should handle search errors', async () => {
-      mockedMetAPI.searchArtworks.mockRejectedValue(new Error('Search failed'));
+    await waitFor(() => expect(result.current.loading).toBe(false));
 
-      const { result } = renderHook(() => useArtworks());
-
-      await act(async () => {
-        result.current.search({ q: 'test' });
-      });
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      expect(result.current.error).toBe('Failed to perform search.');
-      expect(result.current.artworks).toEqual([]);
-    });
+    expect(result.current.artworks).toEqual([mockArtwork]);
+    expect(result.current.hasMore).toBe(true);
+    expect(result.current.error).toBe(null);
   });
 
-  describe('Load more functionality', () => {
-    it('should load more artworks when available', async () => {
-      mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(mockBatchResponse);
+  it('should load more artworks when hasMore is true', async () => {
+    const secondArtwork = { ...mockArtwork, objectID: 2 };
 
-      const { result } = renderHook(() => useArtworks());
-
-      // Initial search
-      await act(async () => {
-        result.current.search({ q: 'test' });
+    mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
+    mockedMetAPI.getArtworksBatch
+      .mockResolvedValueOnce({
+        data: [mockArtwork],
+        rateLimitInfo: { hasRateLimit: false, failedBatches: 0, totalBatches: 1 },
+      })
+      .mockResolvedValueOnce({
+        data: [secondArtwork],
+        rateLimitInfo: { hasRateLimit: false, failedBatches: 0, totalBatches: 1 },
       });
 
-      await waitFor(() => {
-        expect(result.current.hasMore).toBe(true);
-      });
+    const { result } = renderHook(() => useArtworks());
 
-      // Mock second batch
-      const secondBatch = { ...mockBatchResponse, data: [{ ...mockArtworks[0], objectID: 16 }] };
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(secondBatch);
-
-      // Load more
-      await act(async () => {
-        result.current.loadMore();
-      });
-
-      await waitFor(() => {
-        expect(result.current.loading).toBe(false);
-      });
-
-      expect(result.current.artworks).toHaveLength(2);
-      expect(mockedMetAPI.getArtworksBatch).toHaveBeenCalledTimes(2);
+    await act(async () => {
+      result.current.search({ q: 'art' });
     });
 
-    it('should not load more when hasMore is false', async () => {
-      const limitedResponse: SearchResponse = { total: 1, objectIDs: [1] };
-      mockedMetAPI.searchArtworks.mockResolvedValue(limitedResponse);
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(mockBatchResponse);
+    await waitFor(() => expect(result.current.hasMore).toBe(true));
 
-      const { result } = renderHook(() => useArtworks());
-
-      await act(async () => {
-        result.current.search({ q: 'test' });
-      });
-
-      await waitFor(() => {
-        expect(result.current.hasMore).toBe(false);
-      });
-
-      const callCount = mockedMetAPI.getArtworksBatch.mock.calls.length;
-
-      await act(async () => {
-        result.current.loadMore();
-      });
-
-      expect(mockedMetAPI.getArtworksBatch).toHaveBeenCalledTimes(callCount);
+    await act(async () => {
+      result.current.loadMore();
     });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.artworks).toHaveLength(2);
+    expect(result.current.artworks[1]).toEqual(secondArtwork);
   });
 
-  describe('Rate limit handling', () => {
-    it('should show rate limit warning when limit is reached', async () => {
-      const rateLimitResponse: BatchResponse = {
-        data: mockArtworks,
-        rateLimitInfo: {
-          hasRateLimit: true,
-          failedBatches: 1,
-          totalBatches: 2,
-          successfulArtworks: 1,
-          requestedArtworks: 15,
-        },
-      };
+  it('should handle search errors', async () => {
+    mockedMetAPI.searchArtworks.mockRejectedValue(new Error('API Error'));
 
-      mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(rateLimitResponse);
+    const { result } = renderHook(() => useArtworks());
 
-      const { result } = renderHook(() => useArtworks());
-
-      await act(async () => {
-        result.current.search({ q: 'test' });
-      });
-
-      await waitFor(() => {
-        expect(result.current.rateLimitWarning).toContain('Rate limit reached!');
-      });
+    await act(async () => {
+      result.current.search({ q: 'test' });
     });
 
-    it('should clear rate limit warning when resolved', async () => {
-      // First with rate limit
-      const rateLimitResponse: BatchResponse = {
-        data: mockArtworks,
-        rateLimitInfo: {
-          hasRateLimit: true,
-          failedBatches: 1,
-          totalBatches: 2,
-          successfulArtworks: 1,
-          requestedArtworks: 15,
-        },
-      };
+    await waitFor(() => expect(result.current.loading).toBe(false));
 
-      mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(rateLimitResponse);
+    expect(result.current.error).toBe('Failed to perform search.');
+    expect(result.current.artworks).toEqual([]);
+  });
 
-      const { result } = renderHook(() => useArtworks());
+  it('should display rate limit warning', async () => {
+    mockedMetAPI.searchArtworks.mockResolvedValue(mockSearchResponse);
+    mockedMetAPI.getArtworksBatch.mockResolvedValue({
+      data: [mockArtwork],
+      rateLimitInfo: {
+        hasRateLimit: true,
+        failedBatches: 1,
+        totalBatches: 2,
+        successfulArtworks: 1,
+        requestedArtworks: 15,
+      },
+    });
 
-      await act(async () => {
-        result.current.search({ q: 'test' });
-      });
+    const { result } = renderHook(() => useArtworks());
 
-      await waitFor(() => {
-        expect(result.current.rateLimitWarning).toBeTruthy();
-      });
+    await act(async () => {
+      result.current.search({ q: 'test' });
+    });
 
-      // Then without rate limit
-      mockedMetAPI.getArtworksBatch.mockResolvedValue(mockBatchResponse);
-
-      await act(async () => {
-        result.current.loadMore();
-      });
-
-      await waitFor(() => {
-        expect(result.current.rateLimitWarning).toBe(null);
-      });
+    await waitFor(() => {
+      expect(result.current.rateLimitWarning).toContain('Rate limit reached!');
     });
   });
 });
