@@ -29,7 +29,19 @@
 ## 🏗️ Architecture
 I used a BFF approach:
 - The **frontend** only talks to our backend
-- The **backend** works as a proxy, connecting with the Met Museum API 
+- The **backend** works as a proxy, connecting with the Met Museum API
+
+## 📌 Requirements
+
+- **Node.js**: **v22** (recommended)
+
+Vite has a problem with old versions of Node.js. If you use Node.js below version 22, you can get this error:
+
+```js
+TypeError: crypto.hash is not a function
+```
+ - [TypeError: crypto.hash is not a function · Issue #20287 · vitejs/vite](https://github.com/vitejs/vite/issues/20287)
+ - [TypeError: crypto.hash is not a function | Dev Server not starting · vitejs/vite · Discussion #20411](https://github.com/vitejs/vite/discussions/20411)
 
 ## 🚀 How to Run
 
