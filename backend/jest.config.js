@@ -22,9 +22,7 @@ module.exports = {
     'html'
   ],
   setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  },
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
   clearMocks: true,
   restoreMocks: true,
   verbose: true,
