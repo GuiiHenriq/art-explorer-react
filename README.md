@@ -20,6 +20,7 @@
 ### Backend (BFF)
 - **Language**: NodeJS + Express + Typescript
 - **Libs**: Axios
+- **Tests**: Jest + Supertest
 
 ### Quality
 - **Linting**: ESLint + Prettier
