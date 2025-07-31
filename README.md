@@ -157,14 +157,14 @@ graph TD
 
 ## 📋 Extra Items Checklist
 
-⚠️ • **Search bar with autocomplete** (I did not make auto-complete)
-✅ • **Filter by department or artist** 
-✅ • **Animations with Framer Motion** 
-❌ • **Dark mode**
-✅ • **Deploy**
-✅ • **Zustand**
-✅ • **Back-end**
-✅ • **Unit Tests** 
+- ⚠️ **Search bar with autocomplete** (I did not make auto-complete)
+- ✅ **Filter by department or artist** 
+- ✅ **Animations with Framer Motion** 
+- ❌ **Dark mode**
+- ✅ **Deploy**
+- ✅ **Zustand**
+- ✅ **Back-end**
+- ✅ **Unit Tests** 
 
 ## ⏳ Future Improvements
 
